@@ -6,6 +6,7 @@ from ok import BaseTask
 name_re = re.compile('[a-zA-Z\u4e00-\u9fff]+')
 stamina_re = re.compile(r"^\d+/\d+")
 
+
 class ErBaseTask(BaseTask):
 
     def __init__(self, *args, **kwargs):
@@ -16,18 +17,18 @@ class ErBaseTask(BaseTask):
 
     def is_main(self):
         texts = self.ocr()
-        if continue_game:=self.find_boxes(texts, [re.compile('点击空白处'), '点击领取']):
+        if continue_game := self.find_boxes(texts, [re.compile('点击空白处'), '点击领取']):
             self.click(continue_game, after_sleep=1)
             return False
         if self.find_boxes(texts, ['适龄提示', '每日签到']):
-            self.click(0.5,0.75, after_sleep=1)
+            self.click(0.5, 0.75, after_sleep=1)
             return False
         if self.find_boxes(texts, ['返回登录', '继续游戏']):
             self.back(after_sleep=1)
             return False
         if self.find_boxes(texts, ['自动', '手动'], boundary='top_right'):
             if not self.find_boxes(texts, match='退出战斗'):
-                self.click(0.94,0.05, after_sleep=1)
+                self.click(0.94, 0.05, after_sleep=1)
             self.log_info('退出战斗, 点击esc')
             self.back(after_sleep=1)
             self.wait_click_ocr(match='确定', box='bottom_right', after_sleep=2, raise_if_not_found=True)
@@ -40,7 +41,7 @@ class ErBaseTask(BaseTask):
         if self.has_menu(texts):  # 右上菜单已经打开
             self.sleep(1)
             return self.ocr()
-        match = self.find_boxes(texts, ['活动','超链之证','商店', stamina_re], boundary='top')
+        match = self.find_boxes(texts, ['活动', '超链之证', '商店', stamina_re], boundary='top')
         self.log_debug('match: {}'.format(match))
         if len(match) >= 2:  # 主页
             self.log_debug('找到活动/商店, 主页')
@@ -53,16 +54,21 @@ class ErBaseTask(BaseTask):
     def has_menu(self, texts):
         if not texts:
             texts = self.ocr()
-        boxes = self.find_boxes(texts, match=['任务','商店','背包'], boundary='top_right')
+        boxes = self.find_boxes(texts, match=['任务', '商店', '背包'], boundary='top_right')
         self.log_debug('check is_challenge: {}'.format(boxes))
         return len(boxes) >= 3
 
     def is_challenge(self, texts=None):
         if not texts:
             texts = self.ocr()
-        boxes = self.find_boxes(texts, match=['主线','竞技之域','超链协会'])
+        boxes = self.find_boxes(texts, match=['主线', '竞技之域', '超链协会'])
         self.log_debug('check is_challenge: {}'.format(boxes))
         return len(boxes) >= 3
+
+    def click(self, *args, **kwargs):
+        kwargs['down_time'] = 0.0001
+        kwargs['move'] = True
+        super().click(*args, **kwargs)
 
     def go_to_menu(self, name):
         texts = self.ensure_main()
@@ -74,10 +80,10 @@ class ErBaseTask(BaseTask):
         if not self.is_challenge(texts):
             self.go_to_menu('挑战')
         if index:
-            self.wait_click_ocr(match=index, box='left', after_sleep=1)
+            self.wait_click_ocr(match=index, box='left', after_sleep=2)
         if name:
             texts = self.ocr()
-            to_click = self.find_boxes(texts, match=name)[0]
+            to_click = self.find_boxes(texts, match=name)
             self.log_info(f'go_to_challenge check name {name} {to_click} {check_not_challenged}')
             if check_not_challenged:
                 boundary = to_click.copy(y_offset=-to_click.height)
@@ -86,10 +92,11 @@ class ErBaseTask(BaseTask):
                     return False
             while True:
                 texts = self.ocr()
-                to_click = self.find_boxes(texts, match=name)[0]
+                to_click = self.find_boxes(texts, match=name)
                 if to_click and self.is_challenge(texts):
-                    self.click(to_click, after_sleep=1)
+                    self.click(to_click, after_sleep=2)
                 else:
+                    self.sleep(2)
                     break
             return True
 
@@ -97,13 +104,42 @@ class ErBaseTask(BaseTask):
         if self.go_to_challenge(name=name, index='限时活动', check_not_challenged=check_not_challenged):
             self.battle()
 
-    def battle(self):
-        self.wait_click_ocr(box='bottom_right', match='前往挑战', after_sleep=1, raise_if_not_found=True)
+    def continues_battle(self):
+        self.log_info('点击开始连续战斗')
+        self.wait_click_ocr(box='bottom_right', match='连续战斗', after_sleep=1, raise_if_not_found=True)
+        self.wait_click_ocr(match='开始战斗', after_sleep=1, raise_if_not_found=True)
+        self.sleep(3)
+        self.use_preset()
+        self.click(0.95, 0.15, after_sleep=1)
+
+    def auto_restart(self):
+        while True:
+            done = self.ocr(match="完成")
+            if not done:
+                self.log_info('没有找到完成 继续等待')
+                self.sleep(3)
+                continue
+            self.log_info('找到完成, 尝试使用体力药')
+            self.use_stamina()
+            self.log_info('点击完成')
+            self.click(done, after_sleep=1)
+            self.wait_click_ocr(box='bottom_right', match='再来一次', after_sleep=1, raise_if_not_found=True)
+            if start := self.ocr(match='开始战斗'):
+                self.click(start, after_sleep=3)
+                if self.ocr(match='开始战斗'):
+                    self.log_info('体力用尽, 结束', notify=True)
+                    break
+
+    def use_preset(self):
         self.wait_click_ocr(box='bottom_right', match='预设', after_sleep=1, settle_time=0.5, raise_if_not_found=True)
         if not self.wait_click_ocr(box='left', match='使用', after_sleep=1, raise_if_not_found=False):
             raise Exception('没有预设阵容, 无法进行自动战斗!')
         self.wait_click_ocr(box='right', match='确定', after_sleep=1, raise_if_not_found=False, time_out=1)
         self.wait_click_ocr(box='bottom_right', match='战斗', after_sleep=1, raise_if_not_found=True)
+
+    def battle(self):
+        self.wait_click_ocr(box='bottom_right', match='前往挑战', after_sleep=1, raise_if_not_found=True)
+        self.use_preset()
         start = time.time()
         while time.time() - start < 800:
             texts = self.ocr()
@@ -119,9 +155,8 @@ class ErBaseTask(BaseTask):
             self.info_set('战斗时间', int(time.time() - start))
         self.log_info('战斗结束')
 
-
     def find_stamina(self):
-        stamina_text = self.ocr(box='top_right', match=stamina_re)
+        stamina_text = self.wait_ocr(box='top_right', match=stamina_re, raise_if_not_found=True)
         if stamina_text:
             current = int(stamina_text[0].name.split('/')[0])
             self.info_set(f'stamina', current)
@@ -157,12 +192,3 @@ class ErBaseTask(BaseTask):
             else:
                 self.log_info('没有体力药或者设置为不使用体力药')
                 self.back()
-
-
-
-
-
-
-
-
-
