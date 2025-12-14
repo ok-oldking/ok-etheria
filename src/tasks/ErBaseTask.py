@@ -18,6 +18,9 @@ class ErBaseTask(BaseTask):
 
     def is_main(self):
         texts = self.ocr()
+        if self.find_boxes(texts, match='请选择兑换道具'):
+            self.back(after_sleep=1)
+            return False
         if continue_game := self.find_boxes(texts, [re.compile('点击空白处'), '点击领取']):
             self.click(continue_game, after_sleep=1)
             return False
@@ -194,7 +197,8 @@ class ErBaseTask(BaseTask):
                             raise_if_not_found=False)
 
     def use_stamina(self):
-        if not self.config.get('使用体力药'):
+        if not self.config.get('使用体力药') or not self.config.get('买60钻体力') or self.config.get('买100钻体力'):
+            self.log_info('没有设置买体力, 跳过购买体力')
             return
         stamina = self.find_stamina()
         if stamina < 0:
@@ -211,7 +215,28 @@ class ErBaseTask(BaseTask):
         self.log_info('stamina use_count: {}'.format(use_count))
         if use_count > 0:
             self.click(0.57, 0.05, after_sleep=1)
-            if self.ocr(match=re.compile('精神稳定剂')) and self.config.get('使用体力药'):
+            texts = self.ocr()
+            if self.find_boxes(texts, match=re.compile('精神稳定剂数量不足')):
+                self.back(after_sleep=1)
+                self.log_info('已经买满体力')
+                return
+            if not self.config.get('使用体力药'):
+                self.click(0.57, 0.42, after_sleep=1)
+                self.log_info('点击使用钻')
+            if self.find_boxes(texts, match=re.compile('花费精神稳定剂')) and self.config.get('使用体力药'):
+                self.log_info('使用体力药')
+                buy = True
+            elif self.config.get('买100钻体力'):
+                self.log_info('买100钻体力')
+                buy = True
+            elif self.config.get('买60钻体力') and self.find_boxes(texts, match=re.compile('花费60海')):
+                buy = True
+                use_count = 1
+                self.log_info('买一次60钻体力')
+            else:
+                self.log_info('设置为不购买体力!')
+                buy = False
+            if buy:
                 if use_count > 1:
                     self.log_info('点击增加体力药')
                     self.click(0.61, 0.57, after_sleep=1)
@@ -219,6 +244,7 @@ class ErBaseTask(BaseTask):
                 self.log_info('点击确定')
                 self.click(0.51, 0.94, after_sleep=1)
                 self.log_info('点击空白')
+
             else:
                 self.log_info('没有体力药或者设置为不使用体力药')
-                self.back()
+                self.back(after_sleep=1)

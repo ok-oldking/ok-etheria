@@ -16,6 +16,8 @@ class FarmTask(ErBaseTask):
         self.default_config.update({
             '刷什么': "多琪",
             '使用体力药': False,
+            '买60钻体力': False,
+            '买100钻体力': False,
         })
         self.yuanqi = ['兵祸', '多琪', '奥洛拉']
         self.zhiqiao = ['妮可娜娜', '莎朗', '赫妍', '炼狱津', '科洛罗']
