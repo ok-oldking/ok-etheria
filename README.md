@@ -45,7 +45,7 @@
 
 * **[GitHub](https://github.com/ok-oldking/ok-wuthering-waves/releases)**: 官方发布页，全球访问速度快。（*
   *请下载 `setup.exe` 安装包，而不是 `Source Code` 源码压缩包**）
-* **[Mirror酱](https://mirrorchyan.com/zh/projects?rid=okww&source=ok-ww-readme)**: 国内镜像，下载可能需要购买其平台的
+* **[Mirror酱](https://mirrorchyan.com/zh/projects?rid=ok-etheria&source=ok-er-readme)**: 国内镜像，下载可能需要购买其平台的
   CD-KEY。
 * **[夸克网盘](https://pan.quark.cn/s/a1052cec4d13)**: 国内网盘，免费，但需要注册并使用其客户端下载。
 
