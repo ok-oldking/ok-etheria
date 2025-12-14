@@ -11,7 +11,7 @@ class DailyTask(FarmTask):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.name = "清日常任务"
+        self.name = "一键收菜"
         self.description = "每个活动必须有预设阵容, 预设阵容必须能赢"
         self.icon = FluentIcon.SYNC
         self.default_config.update({

@@ -23,6 +23,12 @@
             "height": 2160,
             "id": 3,
             "file_name": "images/2.png"
+        },
+        {
+            "width": 3840,
+            "height": 2160,
+            "id": 4,
+            "file_name": "images/3.png"
         }
     ],
     "categories": [
@@ -36,14 +42,18 @@
         },
         {
             "id": 2,
-            "name": "manual"
+            "name": "chat_main_page"
         },
         {
             "id": 3,
-            "name": "pause"
+            "name": "manual"
         },
         {
             "id": 4,
+            "name": "pause"
+        },
+        {
+            "id": 5,
             "name": "x2"
         }
     ],
@@ -66,7 +76,7 @@
         {
             "id": 1,
             "image_id": 1,
-            "category_id": 4,
+            "category_id": 5,
             "segmentation": [],
             "bbox": [
                 1388.7522541102041,
@@ -81,7 +91,7 @@
         {
             "id": 2,
             "image_id": 2,
-            "category_id": 3,
+            "category_id": 4,
             "segmentation": [],
             "bbox": [
                 3597.925072046109,
@@ -96,7 +106,7 @@
         {
             "id": 3,
             "image_id": 2,
-            "category_id": 2,
+            "category_id": 3,
             "segmentation": [],
             "bbox": [
                 3395.45578365776,
@@ -122,6 +132,21 @@
             "ignore": 0,
             "iscrowd": 0,
             "area": 4810.370150336864
+        },
+        {
+            "id": 5,
+            "image_id": 4,
+            "category_id": 2,
+            "segmentation": [],
+            "bbox": [
+                227.20461095100865,
+                1982.5936599423628,
+                84.03458213256465,
+                74.69740634005807
+            ],
+            "ignore": 0,
+            "iscrowd": 0,
+            "area": 6277.165328173165
         }
     ],
     "info": {
@@ -130,6 +155,6 @@
         "description": "",
         "contributor": "Label Studio",
         "url": "",
-        "date_created": "2025-12-14 17:32:58.439853"
+        "date_created": "2025-12-14 20:30:21.030546"
     }
 }

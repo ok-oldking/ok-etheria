@@ -43,10 +43,9 @@ class ErBaseTask(BaseTask):
         if self.has_menu(texts):  # 右上菜单已经打开
             self.sleep(1)
             return self.ocr()
-        match = self.find_boxes(texts, ['活动', '超链之证', '商店', stamina_re], boundary='top')
-        self.log_debug('match: {}'.format(match))
-        if len(match) >= 2:  # 主页
-            self.log_debug('找到活动/商店, 主页')
+        chat_main_page = self.find_one('chat_main_page')
+        if chat_main_page:  # 主页
+            self.log_debug(f'找到chat_main_page, 主页 {chat_main_page}')
             self.send_key('tab', after_sleep=1)
             return False
         else:
@@ -71,6 +70,14 @@ class ErBaseTask(BaseTask):
             self.is_double = self.find_one('x2')
             self.log_info(f'is_double: {self.is_double}')
         return is_challenge
+
+    def claim_quest(self):
+        self.go_to_menu('任务')
+        if claim := self.ocr(box='bottom_right', match='全部领取'):
+            self.click(claim, after_sleep=1)
+        while claim := self.ocr(box='bottom_left', match='领取'):
+            self.click(claim, after_sleep=1)
+            self.handle_click_empty()
 
     def click(self, *args, **kwargs):
         kwargs['down_time'] = 0.0001
@@ -125,8 +132,10 @@ class ErBaseTask(BaseTask):
         while True:
             done = self.ocr(match="完成")
             if not done:
-                self.log_info('没有找到完成 继续等待')
-                self.sleep(3)
+                self.log_info('没有找到完成, 检查领取任务')
+                self.claim_quest()
+                self.go_to_challenge()
+                self.sleep(30)
                 continue
             self.log_info('找到完成, 尝试使用体力药')
             self.use_stamina()
