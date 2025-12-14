@@ -128,8 +128,13 @@ class ErBaseTask(BaseTask):
         self.wait_click_ocr(box='bottom_right', match='连续战斗', after_sleep=1, raise_if_not_found=True)
         self.wait_click_ocr(match='开始战斗', after_sleep=1, raise_if_not_found=True)
         self.sleep(3)
+        if self.ocr(match='开始战斗'):
+            self.log_info('体力已用尽', notify=True)
+            self.ensure_main()
+            return False
         self.use_preset()
         self.click(0.95, 0.15, after_sleep=1)
+        return True
 
     def auto_restart(self):
         while True:
@@ -149,6 +154,7 @@ class ErBaseTask(BaseTask):
                 self.click(start, after_sleep=3)
                 if self.ocr(match='开始战斗'):
                     self.log_info('体力用尽, 结束', notify=True)
+                    self.ensure_main()
                     break
 
     def use_preset(self):

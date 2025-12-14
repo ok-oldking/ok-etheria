@@ -46,5 +46,5 @@ class FarmTask(ErBaseTask):
         self.screenshot('farm')
         # self.wait_click_ocr(match=re.compile(to_farm), raise_if_not_found=True, after_sleep=3)
         self.click(0.55, 0.5, after_sleep=2)
-        self.continues_battle()
-        self.auto_restart()
+        if self.continues_battle():
+            self.auto_restart()
