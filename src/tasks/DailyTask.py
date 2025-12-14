@@ -17,6 +17,9 @@ class DailyTask(FarmTask):
         self.default_config.update({
             '协会祈愿': ''
         })
+        self.config_description.update({
+            '协会祈愿': "自动发布和领取祈愿, 输入完整名字, 必须在第一页, 不输入则不祈愿",
+        })
 
     def run(self):
         self.log_info('日常任务开始运行!', notify=True)
@@ -34,7 +37,9 @@ class DailyTask(FarmTask):
             self.back(after_sleep=1)
         if hero := self.config.get('协会祈愿'):
             self.wait_click_ocr(box='bottom_right', match='协会共助', raise_if_not_found=True, after_sleep=3)
-
+            if claim := self.ocr(box='top_left', match=re.compile('可领取')):
+                self.click(claim, after_sleep=1)
+                self.handle_click_empty(time_out=3)
             fabu = self.ocr(box='top_left', match=re.compile('点击发布'))
             if fabu:
                 self.click(fabu, after_sleep=1)
@@ -46,9 +51,9 @@ class DailyTask(FarmTask):
                     self.back(after_sleep=1)
             else:
                 self.back(after_sleep=1)
-
         self.wait_click_ocr(match='锚点勘测', box='top_right', after_sleep=3, raise_if_not_found=True)
-        self.handle_click_empty()
+        self.handle_click_empty(time_out=2)
+        self.log_info('开始检查是否打过协会战')
         if not self.ocr(match=[re.compile('sss', re.IGNORECASE), '100'], box='bottom_left'):
             self.log_info('协会boss, 未达到sss, 进入战斗')
             self.battle()
