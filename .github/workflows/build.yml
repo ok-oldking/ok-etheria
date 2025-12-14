@@ -84,3 +84,11 @@ jobs:
             ### 下载Release-setup.exe, 下载后可应用内更新
           files: pyappify_dist/*
 
+      - name: Trigger MirrorChyanUploading
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release.yml -f tag=${{ steps.sync.outputs.end_tag }}
+          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note.yml -f tag=${{ steps.sync.outputs.end_tag }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
