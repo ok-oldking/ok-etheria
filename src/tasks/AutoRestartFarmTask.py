@@ -8,7 +8,6 @@ class AutoRestartFarmTask(ErBaseTask):
         self.name = "自动再来一次"
         self.description = "需要在能显示完成按钮的界面开始, 自动点击挂机的完成, 并且根据配置使用体力"
         self.default_config.update({
-            '是否双倍中': False,
             '使用体力药': False,
         })
 

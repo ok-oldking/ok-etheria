@@ -15,7 +15,6 @@ class FarmTask(ErBaseTask):
         self.icon = FluentIcon.SYNC
         self.default_config.update({
             '刷什么': "多琪",
-            '是否双倍中': False,
             '使用体力药': False,
         })
         self.yuanqi = ['兵祸', '多琪', '奥洛拉']

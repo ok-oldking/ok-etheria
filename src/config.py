@@ -1,7 +1,6 @@
 import os
 
 version = "dev"
-# 不需要修改version, Github Action打包会自动修改
 
 config = {
     'debug': False,  # Optional, default: False
@@ -17,8 +16,16 @@ config = {
             'use_openvino': True,
         }
     },
+    'template_matching': {  # 可选, 如使用OpenCV的模板匹配
+        'coco_feature_json': os.path.join('assets', 'result.json'),
+        # coco格式标记, 需要png图片, 在debug模式运行后, 会对进行切图仅保留被标记部分以减少图片大小
+        'default_horizontal_variance': 0.002,  # 默认x偏移, 查找不传box的时候, 会根据coco坐标, match偏移box内的
+        'default_vertical_variance': 0.002,  # 默认y偏移
+        'default_threshold': 0.8,  # 默认threshold
+    },
     'windows': {  # Windows游戏请填写此设置
         'exe': ['GameUE_cpp-Win64-Shipping.exe'],
+        'calculate_pc_exe_path': 'taptap://taptap.com/app?app_id=236627&platform=pc&auto_launch=true&ch_src=desktop---',
         # 'hwnd_class': 'UnrealWindow', #增加重名检查准确度
         'interaction': 'PostMessage',
         # Genshin:某些操作可以后台, 部分游戏支持 PostMessage:可后台点击, 极少游戏支持 ForegroundPostMessage:前台使用PostMessage Pynput/PyDirect:仅支持前台使用

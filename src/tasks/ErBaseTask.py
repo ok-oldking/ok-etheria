@@ -11,6 +11,7 @@ class ErBaseTask(BaseTask):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.is_double = None
 
     def ensure_main(self):
         return self.wait_until(self.is_main, time_out=30, raise_if_not_found=True)
@@ -28,6 +29,7 @@ class ErBaseTask(BaseTask):
             return False
         if self.find_boxes(texts, ['自动', '手动'], boundary='top_right'):
             if not self.find_boxes(texts, match='退出战斗'):
+                self.log_info('战斗中, 点击暂停退出')
                 self.click(0.94, 0.05, after_sleep=1)
             self.log_info('退出战斗, 点击esc')
             self.back(after_sleep=1)
@@ -55,15 +57,20 @@ class ErBaseTask(BaseTask):
         if not texts:
             texts = self.ocr()
         boxes = self.find_boxes(texts, match=['任务', '商店', '背包'], boundary='top_right')
-        self.log_debug('check is_challenge: {}'.format(boxes))
+        self.log_debug('check has_menu: {}'.format(boxes))
         return len(boxes) >= 3
 
     def is_challenge(self, texts=None):
         if not texts:
             texts = self.ocr()
-        boxes = self.find_boxes(texts, match=['主线', '竞技之域', '超链协会'])
+        boxes = self.find_boxes(texts, match=['日常挑战', '试炼挑战', '限时活动'], boundary='top_left')
+        is_challenge = len(boxes) >= 3
         self.log_debug('check is_challenge: {}'.format(boxes))
-        return len(boxes) >= 3
+        if is_challenge and self.is_double is None:
+            self.click(self.find_boxes(texts, match=['日常挑战'], boundary='top_left'), after_sleep=1)
+            self.is_double = self.find_one('x2')
+            self.log_info(f'is_double: {self.is_double}')
+        return is_challenge
 
     def click(self, *args, **kwargs):
         kwargs['down_time'] = 0.0001
@@ -74,16 +81,18 @@ class ErBaseTask(BaseTask):
         texts = self.ensure_main()
         click = self.find_boxes(texts, match=name)
         self.click(click, after_sleep=2)
+        self.log_info('打开菜单成功! {}'.format(name))
 
     def go_to_challenge(self, index='日常挑战', name=None, check_not_challenged=False):
         texts = self.ocr()
         if not self.is_challenge(texts):
+            self.log_info('不在挑战界面, 去挑战界面')
             self.go_to_menu('挑战')
         if index:
-            self.wait_click_ocr(match=index, box='left', after_sleep=2)
+            self.wait_click_ocr(match=index, box='left', after_sleep=2, raise_if_not_found=True)
         if name:
             texts = self.ocr()
-            to_click = self.find_boxes(texts, match=name)
+            to_click = self.find_boxes(texts, match=name)[0]
             self.log_info(f'go_to_challenge check name {name} {to_click} {check_not_challenged}')
             if check_not_challenged:
                 boundary = to_click.copy(y_offset=-to_click.height)
@@ -138,11 +147,19 @@ class ErBaseTask(BaseTask):
         self.wait_click_ocr(box='bottom_right', match='战斗', after_sleep=1, raise_if_not_found=True)
 
     def battle(self):
-        self.wait_click_ocr(box='bottom_right', match='前往挑战', after_sleep=1, raise_if_not_found=True)
+        self.wait_click_ocr(box='bottom_right', match='前往挑战', after_sleep=1, settle_time=1, raise_if_not_found=True)
         self.use_preset()
         start = time.time()
         while time.time() - start < 800:
             texts = self.ocr()
+            if manual := self.find_boxes(texts, match="手动", boundary='top_right'):
+                self.click(manual, after_sleep=3)
+                continue
+            if self.find_boxes(texts, match=re.compile('波次'), boundary='top_left') and not self.find_boxes(texts,
+                                                                                                             match="自动",
+                                                                                                             boundary='top_right'):
+                self.log_info('找不到自动, 尝试点击')
+                self.click(0.9, 0.05, after_sleep=3)
             if click := self.find_boxes(texts, re.compile('点击空白处')):
                 self.log_info('战斗结束, 点击空白处关闭!')
                 self.click(click, after_sleep=1)
@@ -163,6 +180,10 @@ class ErBaseTask(BaseTask):
             return current
         return -1
 
+    def handle_click_empty(self, time_out=0.5):
+        self.wait_click_ocr(box='bottom', match=re.compile('点击空白处'), time_out=time_out, after_sleep=1,
+                            raise_if_not_found=False)
+
     def use_stamina(self):
         if not self.config.get('使用体力药'):
             return
@@ -171,12 +192,12 @@ class ErBaseTask(BaseTask):
             raise Exception('找不到体力')
         use_count = 0
         if stamina < 100:
-            if self.config.get('是否双倍中'):
+            if self.is_double:
                 use_count = 2
             else:
                 use_count = 1
         elif stamina < 200:
-            if self.config.get('是否双倍中'):
+            if self.is_double:
                 use_count = 1
         self.log_info('stamina use_count: {}'.format(use_count))
         if use_count > 0:
