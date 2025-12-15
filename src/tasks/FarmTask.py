@@ -38,13 +38,15 @@ class FarmTask(ErBaseTask):
         self.use_stamina()
         if go_to == '凶影追缉':
             self.scroll_relative(0.5, 0.5, -50)
-            self.sleep(1)
+            self.sleep(0.5)
+            self.scroll_relative(0.5, 0.5, -50)
+            self.sleep(0.5)
         else:
             for i in range(self.yuanqi.index(to_farm)):
                 self.click(0.8, 0.50, down_time=0.001, after_sleep=2)
         self.ocr(log=True)
-        self.screenshot('farm')
-        # self.wait_click_ocr(match=re.compile(to_farm), raise_if_not_found=True, after_sleep=3)
-        self.click(0.55, 0.5, after_sleep=2)
+        # self.screenshot('farm')
+        self.wait_click_ocr(match=re.compile(to_farm), raise_if_not_found=True, after_sleep=3)
+        # self.click(0.55, 0.5, after_sleep=2)
         if self.continues_battle():
             self.auto_restart()

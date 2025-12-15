@@ -18,7 +18,7 @@ class ErBaseTask(BaseTask):
 
     def is_main(self):
         texts = self.ocr()
-        if self.find_boxes(texts, match='请选择兑换道具'):
+        if self.find_boxes(texts, match=['请选择兑换道具', '游戏公告']):
             self.back(after_sleep=1)
             return False
         if continue_game := self.find_boxes(texts, [re.compile('点击空白处'), '点击领取']):
@@ -109,14 +109,7 @@ class ErBaseTask(BaseTask):
                 if not self.find_boxes(texts, match='今日未挑战', boundary=boundary):
                     self.log_info('今日未挑战 not found')
                     return False
-            while True:
-                texts = self.ocr()
-                to_click = self.find_boxes(texts, match=name)
-                if to_click and self.is_challenge(texts):
-                    self.click(to_click, after_sleep=2)
-                else:
-                    self.sleep(2)
-                    break
+            self.wait_click_ocr(match=name, after_sleep=2, raise_if_not_found=True)
             return True
 
     def challenge_activity(self, name, check_not_challenged=False):
@@ -170,14 +163,10 @@ class ErBaseTask(BaseTask):
         start = time.time()
         while time.time() - start < 800:
             texts = self.ocr()
-            if manual := self.find_boxes(texts, match="手动", boundary='top_right'):
+            if manual := self.find_one('manual'):
+                self.log_info('点击自动战斗')
                 self.click(manual, after_sleep=3)
                 continue
-            if self.find_boxes(texts, match=re.compile('波次'), boundary='top_left') and not self.find_boxes(texts,
-                                                                                                             match="自动",
-                                                                                                             boundary='top_right'):
-                self.log_info('找不到自动, 尝试点击')
-                self.click(0.9, 0.05, after_sleep=3)
             if click := self.find_boxes(texts, re.compile('点击空白处')):
                 self.log_info('战斗结束, 点击空白处关闭!')
                 self.click(click, after_sleep=1)

@@ -43,7 +43,7 @@ class DailyTask(FarmTask):
             fabu = self.ocr(box='top_left', match=re.compile('点击发布'))
             if fabu:
                 self.click(fabu, after_sleep=1)
-                if self.wait_click_ocr(box='left', match=hero, raise_if_not_found=True, after_sleep=1):
+                if self.wait_click_ocr(box='left', match=hero, raise_if_not_found=True, settle_time=1, after_sleep=1):
                     self.wait_click_ocr(box='bottom_left', match='确认祈愿', raise_if_not_found=True, after_sleep=2)
                     self.click(fabu, after_sleep=1)
                     self.wait_click_ocr(match='确定', after_sleep=1, raise_if_not_found=True)
