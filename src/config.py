@@ -65,6 +65,7 @@ config = {
     'onetime_tasks': [  # 用户点击触发的任务
         ["src.tasks.DailyTask", "DailyTask"],
         ["src.tasks.FarmTask", "FarmTask"],
+        ["src.tasks.AutoRtaTask", "AutoRtaTask"],
         # ["src.tasks.AutoRestartFarmTask", "AutoRestartFarmTask"],
         ["ok", "DiagnosisTask"],
     ],

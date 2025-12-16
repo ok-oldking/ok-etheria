@@ -116,6 +116,14 @@ class ErBaseTask(BaseTask):
         if self.go_to_challenge(name=name, index='限时活动', check_not_challenged=check_not_challenged):
             self.battle()
 
+    def click_chars(self):
+        chars = self.wait_ocr(0.05, 0.91, 0.74, 0.98, match=name_re, raise_if_not_found=True, time_out=10)
+        self.log_info('wait chars success')
+        self.sleep(1)
+        for char in chars:
+            self.click(char, after_sleep=0.5)
+            self.log_info(f'click char {char} success')
+
     def continues_battle(self):
         self.log_info('点击开始连续战斗')
         self.wait_click_ocr(box='bottom_right', match='连续战斗', after_sleep=1, raise_if_not_found=True)

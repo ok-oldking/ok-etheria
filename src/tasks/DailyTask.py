@@ -27,6 +27,7 @@ class DailyTask(FarmTask):
         self.challenge_activity('暗笼激斗', True)
         self.xiehui()
         self.farm()
+        self.go_to_menu('任务')
         self.log_info('一键日常完成!', notify=True)
 
     def xiehui(self):
@@ -68,12 +69,7 @@ class DailyTask(FarmTask):
             self.wait_ocr(box='bottom_right', match='开始', raise_if_not_found=True, time_out=60)
         self.log_info('wait 开始 success')
         self.sleep(3)
-        chars = self.wait_ocr(0.26, 0.91, 0.74, 0.98, match=name_re, raise_if_not_found=True, time_out=10)
-        self.log_info('wait chars success')
-        self.sleep(1)
-        for char in chars:
-            self.click(char, after_sleep=0.5)
-            self.log_info(f'click char {char} success')
+        self.click_chars()
         self.log_info('点击上阵角色完成')
         start_time = time.time()
         while time.time() - start_time < 60:
