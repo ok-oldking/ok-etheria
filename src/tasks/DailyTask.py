@@ -64,8 +64,8 @@ class DailyTask(FarmTask):
         if go_to and not self.go_to_challenge('试炼挑战', '幻音剧场', check_not_challenged=True):
             self.log_info('已经挑战')
             return False
-        self.wait_click_ocr(box='bottom_right', match='匹配', after_sleep=1)
-        self.wait_ocr(box='bottom_right', match='开始', raise_if_not_found=True, time_out=60)
+        while self.wait_click_ocr(box='bottom_right', match='匹配', after_sleep=1):
+            self.wait_ocr(box='bottom_right', match='开始', raise_if_not_found=True, time_out=60)
         self.log_info('wait 开始 success')
         self.sleep(3)
         chars = self.wait_ocr(0.26, 0.91, 0.74, 0.98, match=name_re, raise_if_not_found=True, time_out=10)
