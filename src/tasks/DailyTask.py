@@ -23,12 +23,32 @@ class DailyTask(FarmTask):
 
     def run(self):
         self.log_info('日常任务开始运行!', notify=True)
+        self.activity_huanfang()
         self.huanyin()
         self.challenge_activity('暗笼激斗', True)
         self.xiehui()
         self.farm()
         self.go_to_menu('任务')
         self.log_info('一键日常完成!', notify=True)
+
+    def activity_huanfang(self):
+        if self.go_to_challenge(name='幻方奇缘', index='限时活动', check_not_challenged=True):
+            self.wait_ocr(match='幻方奇缘', settle_time=1, raise_if_not_found=True)
+            self.click(0.9, 0.83, after_sleep=1)
+            if not self.wait_ocr(match='发牌结束', settle_time=1):
+                raise Exception('请先发牌完成再开始!')
+            x = 0.15
+            step_x = 0.044
+            step_y = 0.097
+            for i in range(6):
+                y = 0.35
+                for j in range(5):
+                    self.click(x, y, after_sleep=1)
+                    if self.ocr(match='开始战斗'):
+                        self.battle()
+                        self.wait_ocr(match='发牌结束')
+                    y += step_y
+                x += step_x
 
     def xiehui(self):
         self.go_to_menu('超链协会')
@@ -48,7 +68,7 @@ class DailyTask(FarmTask):
                     self.wait_click_ocr(box='bottom_left', match='确认祈愿', raise_if_not_found=True, after_sleep=2)
                     self.click(fabu, after_sleep=1)
                     self.wait_click_ocr(match='确定', after_sleep=1, raise_if_not_found=True)
-                    self.handle_click_empty(time_out=3)
+                    self.handle_click_empty(time_out=5)
                     self.back(after_sleep=1)
             else:
                 self.back(after_sleep=1)
@@ -66,7 +86,7 @@ class DailyTask(FarmTask):
             self.log_info('已经挑战')
             return False
         while self.wait_click_ocr(box='bottom_right', match='匹配', after_sleep=1):
-            self.wait_ocr(box='bottom_right', match='开始', raise_if_not_found=True, time_out=60)
+            self.wait_ocr(box='bottom_right', match='开始', raise_if_not_found=False, time_out=60)
         self.log_info('wait 开始 success')
         self.sleep(3)
         self.click_chars()
