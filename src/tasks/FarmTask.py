@@ -21,8 +21,9 @@ class FarmTask(ErBaseTask):
         })
         self.yuanqi = ['兵祸', '多琪', '奥洛拉']
         self.zhiqiao = ['妮可娜娜', '莎朗', '赫妍', '炼狱津', '科洛罗']
+        self.juexing = ['杜兰铎', 'RC77', '善雅']
         self.config_type["刷什么"] = {'type': "drop_down",
-                                      'options': self.yuanqi + self.zhiqiao, }
+                                      'options': self.yuanqi + self.zhiqiao + self.juexing, }
 
     def run(self):
         self.log_info('日常任务开始运行!', notify=True)
@@ -32,15 +33,22 @@ class FarmTask(ErBaseTask):
         to_farm = self.config.get('刷什么')
         if to_farm in self.yuanqi:
             go_to = '熔断禁区'
+            type = '日常挑战'
+        elif to_farm in self.juexing:
+            go_to = '觉醒试炼'
+            type = '限时活动'
         else:
             go_to = '凶影追缉'
-        self.go_to_challenge(name=go_to)
+            type = '日常挑战'
+        self.go_to_challenge(index=type, name=go_to)
         self.use_stamina()
         if go_to == '凶影追缉':
             self.scroll_relative(0.5, 0.5, -50)
             self.sleep(0.5)
             self.scroll_relative(0.5, 0.5, -50)
             self.sleep(2)
+        elif go_to == '觉醒试炼':
+            self.wait_click_ocr(match=to_farm, after_sleep=2)
         else:
             for i in range(self.yuanqi.index(to_farm)):
                 self.click(0.8, 0.50, down_time=0.001, after_sleep=2)

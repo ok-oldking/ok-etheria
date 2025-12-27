@@ -106,8 +106,13 @@ class ErBaseTask(BaseTask):
                 to_click = boxes[0]
                 self.log_info(f'go_to_challenge check name {name} {to_click} {check_not_challenged}')
                 if check_not_challenged:
-                    boundary = to_click.copy(y_offset=-to_click.height)
-                    if not self.find_boxes(texts, match=['今日未挑战', '今日可挑战'], boundary=boundary):
+                    boundary = to_click.copy(y_offset=-to_click.height * 0.8)
+                    boundary.x -= boundary.width * 0.5
+                    boundary.width = boundary.width * 2
+                    self.draw_boxes('test', boxes=boundary)
+                    if not self.find_boxes(texts, match=[re.compile('未挑战'), re.compile('可挑战'),
+                                                         re.compile('挑战次数')],
+                                           boundary=boundary):
                         self.log_info('今日未挑战 not found')
                         return False
                 self.wait_click_ocr(match=name, after_sleep=2, raise_if_not_found=True)
@@ -160,15 +165,19 @@ class ErBaseTask(BaseTask):
                     break
 
     def use_preset(self):
-        self.wait_click_ocr(box='bottom_right', match='预设', after_sleep=1, settle_time=0.5, raise_if_not_found=True)
-        if not self.wait_click_ocr(box='left', match='使用', after_sleep=1, raise_if_not_found=False, time_out=3):
-            raise Exception('没有预设阵容, 无法进行自动战斗!')
-        self.wait_click_ocr(box='right', match='确定', after_sleep=1, raise_if_not_found=False, time_out=1)
+        if self.wait_click_ocr(box='bottom_right', match='预设', after_sleep=1, settle_time=0.5,
+                               raise_if_not_found=False, time_out=1):
+            if not self.wait_click_ocr(box='left', match='使用', after_sleep=1, raise_if_not_found=False, time_out=3):
+                raise Exception('没有预设阵容, 无法进行自动战斗!')
+            self.wait_click_ocr(box='right', match='确定', after_sleep=1, raise_if_not_found=False, time_out=1)
         self.wait_click_ocr(box='bottom_right', match='战斗', after_sleep=1, raise_if_not_found=True)
 
-    def battle(self):
-        self.wait_click_ocr(box='bottom_right', match=['前往挑战', '开始战斗'], after_sleep=1, settle_time=1,
-                            raise_if_not_found=True)
+    def battle(self, click_enter=True):
+        if click_enter:
+            self.wait_click_ocr(box='bottom_right', match=['前往挑战', '开始战斗'], after_sleep=1, settle_time=1,
+                                raise_if_not_found=True)
+        self.wait_ocr(box='bottom_right', match='战斗', raise_if_not_found=True)
+        self.sleep(0.5)
         self.use_preset()
         start = time.time()
         while time.time() - start < 800:
@@ -185,6 +194,10 @@ class ErBaseTask(BaseTask):
                 self.log_info('战斗结束!')
                 self.sleep(1)
                 break
+            if self.find_boxes(texts, ['获得新卡牌'], 'top'):
+                self.log_info('战斗结束!')
+                self.sleep(1)
+                break
             self.sleep(2)
             self.info_set('战斗时间', int(time.time() - start))
         self.log_info('战斗结束')
@@ -198,7 +211,8 @@ class ErBaseTask(BaseTask):
         return -1
 
     def handle_click_empty(self, time_out=0.5):
-        self.wait_click_ocr(box='bottom', match=re.compile('点击空白处'), time_out=time_out, after_sleep=1,
+        self.wait_click_ocr(match=[re.compile('点击空白处'), '获得物品'], time_out=time_out,
+                            after_sleep=1,
                             raise_if_not_found=False)
 
     def use_stamina(self):

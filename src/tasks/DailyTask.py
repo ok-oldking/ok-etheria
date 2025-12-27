@@ -23,6 +23,7 @@ class DailyTask(FarmTask):
 
     def run(self):
         self.log_info('日常任务开始运行!', notify=True)
+        self.activity_haiying()
         self.activity_huanfang()
         self.huanyin()
         self.challenge_activity('暗笼激斗', True)
@@ -49,6 +50,24 @@ class DailyTask(FarmTask):
                         self.wait_ocr(match='发牌结束')
                     y += step_y
                 x += step_x
+
+    def activity_haiying(self):
+        if self.go_to_challenge(name='骇影迷踪', index='限时活动', check_not_challenged=True):
+            self.wait_click_ocr(match=re.compile('今日剩余次数'), settle_time=1, raise_if_not_found=False)
+            self.sleep(3)
+            while True:
+                texts = self.ocr(box='top')
+                self.click(0.5, 0.5, after_sleep=0.5)
+                for text in texts:
+                    self.click(text, after_sleep=0.5)
+                    if "需求" in text.name and '好友' not in text.name and '协会' not in text.name:
+                        break
+                self.wait_click_ocr(match=re.compile('挑战'), settle_time=1, raise_if_not_found=True)
+                self.battle(click_enter=False)
+                for i in range(4):
+                    self.click(0.5, 0.24, after_sleep=1)
+                if self.ocr(match=re.compile('今日剩余次数')):
+                    break
 
     def xiehui(self):
         self.go_to_menu('超链协会')
