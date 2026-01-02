@@ -66,7 +66,8 @@ config = {
         ["src.tasks.DailyTask", "DailyTask"],
         ["src.tasks.FarmTask", "FarmTask"],
         ["src.tasks.AutoRtaTask", "AutoRtaTask"],
-        # ["src.tasks.AutoRestartFarmTask", "AutoRestartFarmTask"],
+        ["src.tasks.AbyssTask", "AbyssTask"],
+        ["src.tasks.AutoRestartFarmTask", "AutoRestartFarmTask"],
         ["ok", "DiagnosisTask"],
     ],
     # 'trigger_tasks':[ # 不断执行的触发式任务

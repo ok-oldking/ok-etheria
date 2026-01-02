@@ -11,7 +11,6 @@ class ErBaseTask(BaseTask):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.is_double = None
 
     def ensure_main(self):
         return self.wait_until(self.is_main, time_out=30, raise_if_not_found=True)
@@ -68,10 +67,6 @@ class ErBaseTask(BaseTask):
         boxes = self.find_boxes(texts, match=['日常挑战', '试炼挑战', '限时活动'], boundary='top_left')
         is_challenge = len(boxes) >= 3
         self.log_debug('check is_challenge: {}'.format(boxes))
-        if is_challenge and self.is_double is None:
-            self.click(self.find_boxes(texts, match=['日常挑战'], boundary='top_left'), after_sleep=1)
-            self.is_double = self.find_one('x2')
-            self.log_info(f'is_double: {self.is_double}')
         return is_challenge
 
     def claim_quest(self):
@@ -140,7 +135,7 @@ class ErBaseTask(BaseTask):
             self.ensure_main()
             return False
         self.use_preset()
-        self.click(0.95, 0.15, after_sleep=1)
+        self.click(0.95, 0.15, after_sleep=3)
         return True
 
     def auto_restart(self):
@@ -167,18 +162,23 @@ class ErBaseTask(BaseTask):
     def use_preset(self):
         if self.wait_click_ocr(box='bottom_right', match='预设', after_sleep=1, settle_time=0.5,
                                raise_if_not_found=False, time_out=1):
-            if not self.wait_click_ocr(box='left', match='使用', after_sleep=1, raise_if_not_found=False, time_out=3):
+            if not self.wait_click_ocr(box='left', match='使用', after_sleep=1, settle_time=0.5,
+                                       raise_if_not_found=False, time_out=3):
                 raise Exception('没有预设阵容, 无法进行自动战斗!')
-            self.wait_click_ocr(box='right', match='确定', after_sleep=1, raise_if_not_found=False, time_out=1)
-        self.wait_click_ocr(box='bottom_right', match='战斗', after_sleep=1, raise_if_not_found=True)
+            self.wait_click_ocr(box='right', match='确定', after_sleep=1, settle_time=0.5, raise_if_not_found=False,
+                                time_out=1)
+        self.wait_click_ocr(box='bottom_right', match='战斗', settle_time=0.5, after_sleep=3, raise_if_not_found=True)
 
-    def battle(self, click_enter=True):
+    def battle(self, click_enter=True, use_preset=True):
         if click_enter:
-            self.wait_click_ocr(box='bottom_right', match=['前往挑战', '开始战斗'], after_sleep=1, settle_time=1,
-                                raise_if_not_found=True)
+            battle = self.wait_ocr(box='bottom_right', match=['前往挑战', '开始战斗', '进入战斗'],
+                                   raise_if_not_found=True)
+            self.sleep(1)
+            self.click(battle, after_sleep=5)
         self.wait_ocr(box='bottom_right', match='战斗', raise_if_not_found=True)
-        self.sleep(0.5)
-        self.use_preset()
+        self.sleep(1)
+        if use_preset:
+            self.use_preset()
         start = time.time()
         while time.time() - start < 800:
             texts = self.ocr()
@@ -186,15 +186,15 @@ class ErBaseTask(BaseTask):
                 self.log_info('点击自动战斗')
                 self.click(manual, after_sleep=3)
                 continue
-            if click := self.find_boxes(texts, [re.compile('点击空白处'), '异常排除']):
+            if click := self.find_boxes(texts, [re.compile('点击空白处'), '异常排除', '跳过']):
                 self.log_info('战斗结束, 点击空白处关闭!')
                 self.click(click, after_sleep=1)
                 continue
-            if self.find_boxes(texts, ['前往挑战', '发牌结束'], 'bottom_right'):
-                self.log_info('战斗结束!')
+            if end := self.find_boxes(texts, ['前往挑战', '发牌结束', '从出口离开', '前往下一层']):
+                self.log_info(f'战斗结束!{end}')
                 self.sleep(1)
                 break
-            if self.find_boxes(texts, ['获得新卡牌'], 'top'):
+            if self.find_boxes(texts, ['获得新卡牌', '获得全部卡牌', re.compile('Please Choose')], 'top'):
                 self.log_info('战斗结束!')
                 self.sleep(1)
                 break
@@ -216,7 +216,9 @@ class ErBaseTask(BaseTask):
                             raise_if_not_found=False)
 
     def use_stamina(self):
-        if not self.config.get('使用体力药') or not self.config.get('买60钻体力') or self.config.get('买100钻体力'):
+        is_double = self.config.get('使用体力药')
+        if not self.config.get('使用体力药') and not self.config.get('买60钻体力') and not self.config.get(
+                '买100钻体力'):
             self.log_info('没有设置买体力, 跳过购买体力')
             return
         stamina = self.find_stamina()
@@ -224,12 +226,12 @@ class ErBaseTask(BaseTask):
             raise Exception('找不到体力')
         use_count = 0
         if stamina < 100:
-            if self.is_double:
+            if is_double:
                 use_count = 2
             else:
                 use_count = 1
         elif stamina < 200:
-            if self.is_double:
+            if is_double:
                 use_count = 1
         self.log_info('stamina use_count: {}'.format(use_count))
         if use_count > 0:
@@ -242,7 +244,7 @@ class ErBaseTask(BaseTask):
             if not self.config.get('使用体力药'):
                 self.click(0.57, 0.42, after_sleep=1)
                 self.log_info('点击使用钻')
-            if self.find_boxes(texts, match=re.compile('花费精神稳定剂')) and self.config.get('使用体力药'):
+            if self.find_boxes(texts, match=re.compile('精神稳定剂')) and self.config.get('使用体力药'):
                 self.log_info('使用体力药')
                 buy = True
             elif self.config.get('买100钻体力'):
