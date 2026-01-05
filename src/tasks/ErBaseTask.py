@@ -134,6 +134,8 @@ class ErBaseTask(BaseTask):
             self.log_info('体力已用尽', notify=True)
             self.ensure_main()
             return False
+        self.wait_ocr(box='bottom_right', match='战斗', raise_if_not_found=True)
+        self.sleep(1)
         self.use_preset()
         self.click(0.95, 0.15, after_sleep=3)
         return True
