@@ -177,10 +177,12 @@ class ErBaseTask(BaseTask):
                                    raise_if_not_found=True)
             self.sleep(1)
             self.click(battle, after_sleep=5)
-        self.wait_ocr(box='bottom_right', match='战斗', raise_if_not_found=True)
+        battle = self.wait_ocr(box='bottom_right', match='战斗', raise_if_not_found=True)
         self.sleep(1)
         if use_preset:
             self.use_preset()
+        else:
+            self.click(battle)
         start = time.time()
         while time.time() - start < 800:
             texts = self.ocr()
@@ -188,16 +190,24 @@ class ErBaseTask(BaseTask):
                 self.log_info('点击自动战斗')
                 self.click(manual, after_sleep=3)
                 continue
-            if click := self.find_boxes(texts, [re.compile('点击空白处'), '异常排除', '跳过']):
+            exited = False
+            while click := self.find_boxes(texts, [re.compile('点击空白处'), '异常排除', '跳过']):
                 self.log_info('战斗结束, 点击空白处关闭!')
-                self.click(click, after_sleep=1)
-                continue
+                self.click(click, after_sleep=2)
+                texts = self.ocr()
+                exited = True
+            if exited:
+                self.sleep(2)
+                break
             if end := self.find_boxes(texts, ['前往挑战', '发牌结束', '从出口离开', '前往下一层']):
                 self.log_info(f'战斗结束!{end}')
                 self.sleep(1)
                 break
-            if self.find_boxes(texts, ['获得新卡牌', '获得全部卡牌', re.compile('Please Choose')], 'top'):
-                self.log_info('战斗结束!')
+            if boxes := self.find_boxes(texts,
+                                        ['获得新卡牌', '获得全部卡牌', '前往一层', '击败精英',
+                                         re.compile('TAB', re.IGNORECASE),
+                                         re.compile('Please Choose')]):
+                self.log_info(f'战斗结束, 发现box! {boxes}')
                 self.sleep(1)
                 break
             self.sleep(2)

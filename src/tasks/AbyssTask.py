@@ -35,31 +35,9 @@ class AbyssTask(ErBaseTask):
         self.send_key('f', after_sleep=3)
         self.handle_click_empty()
         self.sleep(1)
-        self.send_key('d', down_time=0.2)
-        self.sleep(1)
-        self.send_key('w', down_time=0.2)
-        self.sleep(1)
-        self.send_key('a', down_time=0.2)
-        self.sleep(1)
-        self.sleep(2)
-        self.send_key_down('w')
-        start = time.time()
-        while True:
-            texts = self.ocr()
-            if self.find_boxes(texts, match='开门'):
-                self.send_key_up('w')
-                self.sleep(1)
-                self.send_key('f')
-                self.sleep(8)
-                self.send_key_down('w')
-                start = time.time()
-            if time.time() - start > 10:
-                self.send_key('a', down_time=0.2, after_sleep=1)
-            if self.find_boxes(texts, match='自动挑战'):
-                break
-            self.sleep(1)
-        self.send_key_up('w')
-        self.sleep(2)
+        self.send_key('tab', after_sleep=1)
+        self.wait_click_ocr(match='退出关卡', settle_time=0.5, after_sleep=2, raise_if_not_found=True)
+        self.wait_ocr(match='自动挑战', settle_time=0.5, raise_if_not_found=True)
 
     def battle_once(self):
         self.wait_ocr(match=[re.compile('击败'), '前往下一层'], settle_time=1)
@@ -67,6 +45,7 @@ class AbyssTask(ErBaseTask):
         self.wait_ocr(match='进入战斗')
         self.send_key_up('w')
         self.sleep(2)
+        self.wait_ocr(match=re.compile('卡牌选择'), settle_time=0.5, raise_if_not_found=True)
         self.click(0.25, 0.48, after_sleep=0.5)
         self.click(0.43, 0.48, after_sleep=0.5)
         self.click(0.59, 0.48, after_sleep=0.5)
