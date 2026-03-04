@@ -45,14 +45,18 @@ class ErBaseTask(BaseTask):
         if self.has_menu(texts):  # 右上菜单已经打开
             self.sleep(1)
             return self.ocr()
-        chat_main_page = self.find_one('chat_main_page')
-        if chat_main_page:  # 主页
+        if chat_main_page := self.find_chat():  # 主页
             self.log_debug(f'找到chat_main_page, 主页 {chat_main_page}')
             self.send_key('tab', after_sleep=1)
             return False
         else:
             self.back(after_sleep=1)
             return False
+
+    def find_chat(self):
+        chat_main_page = self.find_one('chat_main_page', horizontal_variance=0.05, vertical_variance=0.05)
+        self.log_debug(f'chat_main_page: {chat_main_page}')
+        return chat_main_page
 
     def has_menu(self, texts):
         if not texts:

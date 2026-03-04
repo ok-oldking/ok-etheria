@@ -20,7 +20,7 @@ class FarmTask(ErBaseTask):
             '买100钻体力': False,
         })
         self.yuanqi = ['兵祸', '多琪', '奥洛拉']
-        self.zhiqiao = ['妮可娜娜', '莎朗', '赫妍', '炼狱津', '科洛罗']
+        self.zhiqiao = ['妮可娜娜', '莎朗', '赫妍', '炼狱津', '科洛罗', '大公']
         self.juexing = ['杜兰铎', 'RC77', '善雅']
         self.config_type["刷什么"] = {'type': "drop_down",
                                       'options': self.yuanqi + self.zhiqiao + self.juexing, }

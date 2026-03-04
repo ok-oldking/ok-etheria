@@ -12,9 +12,10 @@ class TestMyOneTimeTask(TaskTestCase):
 
     config = config
 
-    def test_ocr1(self):
-        # Create a BattleReport object
-        self.assertTrue(True)
+    def test_main2(self):
+        self.set_image('tests/images/main2.png')
+        is_main = self.task.find_chat()
+        self.assertTrue(is_main)
 
 
 if __name__ == '__main__':
