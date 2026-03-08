@@ -6,7 +6,7 @@
 #
 ok-script==1.0.19
     # via -r requirements.in
-onnxocr-ppocrv5==0.0.5
+onnxocr-ppocrv5==0.0.6
     # via -r requirements.in
 pyappify==1.0.2
     # via ok-script

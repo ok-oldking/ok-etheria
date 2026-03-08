@@ -17,6 +17,7 @@ class ErBaseTask(BaseTask):
 
     def is_main(self):
         texts = self.ocr()
+        self.log_debug('is_main: {}'.format(texts))
         if self.find_boxes(texts, match=['请选择兑换道具', '游戏公告']):
             self.back(after_sleep=1)
             return False
@@ -88,6 +89,7 @@ class ErBaseTask(BaseTask):
 
     def go_to_menu(self, name):
         texts = self.ensure_main()
+        self.log_debug('go_to_menu: {}'.format(texts))
         click = self.find_boxes(texts, match=name)
         self.click(click, after_sleep=2)
         self.log_info('打开菜单成功! {}'.format(name))
@@ -95,7 +97,7 @@ class ErBaseTask(BaseTask):
     def go_to_challenge(self, index='日常挑战', name=None, check_not_challenged=False):
         texts = self.ocr()
         if not self.is_challenge(texts):
-            self.log_info('不在挑战界面, 去挑战界面')
+            self.log_info('不在挑战界面, 去挑战界面 {}'.format(texts))
             self.go_to_menu('挑战')
         if index:
             self.wait_click_ocr(match=index, box='left', after_sleep=2, raise_if_not_found=True)

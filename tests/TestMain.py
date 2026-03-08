@@ -17,6 +17,12 @@ class TestMyOneTimeTask(TaskTestCase):
         is_main = self.task.find_chat()
         self.assertTrue(is_main)
 
+    def test_ocr(self):
+        self.set_image('tests/images/ocr.png')
+        is_main = self.task.ocr()
+        self.logger.debug(is_main)
+        self.assertTrue(is_main)
+
 
 if __name__ == '__main__':
     unittest.main()
