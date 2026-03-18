@@ -113,7 +113,7 @@ class DailyTask(FarmTask):
         self.log_info('点击上阵角色完成')
         start_time = time.time()
         while time.time() - start_time < 60:
-            if click := self.ocr(box='bottom_right', match='开始'):
+            if click := self.ocr(box='bottom_right', match=['开始', '准备']):
                 self.click(click, after_sleep=1)
             elif self.ocr(box='bottom_right', match='匹配'):
                 self.huanyin(go_to=False)

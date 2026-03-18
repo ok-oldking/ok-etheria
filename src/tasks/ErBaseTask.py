@@ -46,7 +46,7 @@ class ErBaseTask(BaseTask):
         if self.has_menu(texts):  # 右上菜单已经打开
             self.sleep(1)
             return self.ocr()
-        if chat_main_page := self.find_chat():  # 主页
+        if chat_main_page := self.find_chat() and self.find_boxes(texts, 'Tab'):  # 主页
             self.log_debug(f'找到chat_main_page, 主页 {chat_main_page}')
             self.send_key('tab', after_sleep=1)
             return False
@@ -124,7 +124,7 @@ class ErBaseTask(BaseTask):
             self.battle()
 
     def click_chars(self):
-        chars = self.wait_ocr(0.05, 0.91, 0.74, 0.98, match=name_re, raise_if_not_found=True, time_out=10)
+        chars = self.wait_ocr(0.29, 0.91, 0.74, 0.98, match=name_re, raise_if_not_found=True, time_out=10)
         self.log_info('wait chars success')
         self.sleep(1)
         for char in chars:
@@ -175,7 +175,8 @@ class ErBaseTask(BaseTask):
                 raise Exception('没有预设阵容, 无法进行自动战斗!')
             self.wait_click_ocr(box='right', match='确定', after_sleep=1, settle_time=0.5, raise_if_not_found=False,
                                 time_out=1)
-        self.wait_click_ocr(box='bottom_right', match='战斗', settle_time=0.5, after_sleep=3, raise_if_not_found=True)
+        while battle := self.ocr(box='bottom_right', match='战斗'):
+            self.click(battle, after_sleep=3)
 
     def battle(self, click_enter=True, use_preset=True):
         if click_enter:
