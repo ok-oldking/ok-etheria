@@ -67,6 +67,7 @@ config = {
         ["src.tasks.FarmTask", "FarmTask"],
         ["src.tasks.AutoRtaTask", "AutoRtaTask"],
         ["src.tasks.AbyssTask", "AbyssTask"],
+        ["src.tasks.AutoAlotTask", "AutoAlotTask"],
         ["src.tasks.AutoRestartFarmTask", "AutoRestartFarmTask"],
         ["ok", "DiagnosisTask"],
     ],

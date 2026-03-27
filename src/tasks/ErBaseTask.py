@@ -55,7 +55,7 @@ class ErBaseTask(BaseTask):
             return False
 
     def find_chat(self):
-        chat_main_page = self.find_one('chat_main_page', horizontal_variance=0.05, vertical_variance=0.05)
+        chat_main_page = self.find_one('chat_main_page', horizontal_variance=0.05, vertical_variance=0.05, threshold=0.7)
         self.log_debug(f'chat_main_page: {chat_main_page}')
         return chat_main_page
 
