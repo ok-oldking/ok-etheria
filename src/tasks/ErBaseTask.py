@@ -55,9 +55,9 @@ class ErBaseTask(BaseTask):
             return False
 
     def find_chat(self):
-        chat_main_page = self.find_one('chat_main_page', horizontal_variance=0.05, vertical_variance=0.05, threshold=0.7)
-        self.log_debug(f'chat_main_page: {chat_main_page}')
-        return chat_main_page
+        main = self.find_one(['shop', 'activity'], threshold=0.75, vertical_variance=0.1)
+        self.log_debug(f'chat_main_page: {main}')
+        return main or  self.find_one('chat_main_page', horizontal_variance=0.05, vertical_variance=0.05, threshold=0.7)
 
     def has_menu(self, texts):
         if not texts:
