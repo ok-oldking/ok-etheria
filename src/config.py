@@ -17,7 +17,7 @@ config = {
         }
     },
     'template_matching': {  # 可选, 如使用OpenCV的模板匹配
-        'coco_feature_json': os.path.join('assets', 'result.json'),
+        'coco_feature_json': os.path.join('assets', 'coco_annotations.json'),
         # coco格式标记, 需要png图片, 在debug模式运行后, 会对进行切图仅保留被标记部分以减少图片大小
         'default_horizontal_variance': 0.002,  # 默认x偏移, 查找不传box的时候, 会根据coco坐标, match偏移box内的
         'default_vertical_variance': 0.002,  # 默认y偏移
@@ -67,6 +67,7 @@ config = {
         ["src.tasks.FarmTask", "FarmTask"],
         ["src.tasks.AutoRtaTask", "AutoRtaTask"],
         ["src.tasks.AbyssTask", "AbyssTask"],
+        ["src.tasks.AutoAlotTask", "AutoAlotTask"],
         ["src.tasks.AutoRestartFarmTask", "AutoRestartFarmTask"],
         ["ok", "DiagnosisTask"],
     ],

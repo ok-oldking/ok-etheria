@@ -1,0 +1,202 @@
+{
+  "images": [
+    {
+      "width": 3840,
+      "height": 2160,
+      "id": 0,
+      "file_name": "0.png"
+    },
+    {
+      "width": 3840,
+      "height": 2160,
+      "id": 1,
+      "file_name": "0.png"
+    },
+    {
+      "width": 3840,
+      "height": 2160,
+      "id": 2,
+      "file_name": "1.png"
+    },
+    {
+      "width": 3840,
+      "height": 2160,
+      "id": 3,
+      "file_name": "2.png"
+    },
+    {
+      "width": 3840,
+      "height": 2160,
+      "id": 4,
+      "file_name": "3.png"
+    },
+    {
+      "id": 5,
+      "file_name": "4.png",
+      "width": 3840,
+      "height": 2160
+    }
+  ],
+  "categories": [
+    {
+      "id": 0,
+      "name": "auto"
+    },
+    {
+      "id": 1,
+      "name": "blue_dot"
+    },
+    {
+      "id": 2,
+      "name": "chat_main_page"
+    },
+    {
+      "id": 3,
+      "name": "manual"
+    },
+    {
+      "id": 4,
+      "name": "pause"
+    },
+    {
+      "id": 5,
+      "name": "x2"
+    },
+    {
+      "id": 6,
+      "name": "activity",
+      "supercategory": ""
+    },
+    {
+      "id": 7,
+      "name": "shop",
+      "supercategory": ""
+    }
+  ],
+  "annotations": [
+    {
+      "id": 0,
+      "image_id": 0,
+      "category_id": 1,
+      "segmentation": [],
+      "bbox": [
+        3618.7365088331658,
+        25.23107215332715,
+        31.60132097719478,
+        35.69927133238638
+      ],
+      "ignore": 0,
+      "iscrowd": 0,
+      "area": 1128.14413202671
+    },
+    {
+      "id": 1,
+      "image_id": 1,
+      "category_id": 5,
+      "segmentation": [],
+      "bbox": [
+        1388.7522541102041,
+        336.55529716857046,
+        80.2967372442591,
+        71.16804577091004
+      ],
+      "ignore": 0,
+      "iscrowd": 0,
+      "area": 5714.561871454169
+    },
+    {
+      "id": 2,
+      "image_id": 2,
+      "category_id": 4,
+      "segmentation": [],
+      "bbox": [
+        3597.925072046109,
+        68.47262247838617,
+        65.36023054755097,
+        71.5850144092219
+      ],
+      "ignore": 0,
+      "iscrowd": 0,
+      "area": 4678.813045536502
+    },
+    {
+      "id": 3,
+      "image_id": 2,
+      "category_id": 3,
+      "segmentation": [],
+      "bbox": [
+        3395.45578365776,
+        73.2640700376584,
+        77.89170471290693,
+        65.36023054755034
+      ],
+      "ignore": 0,
+      "iscrowd": 0,
+      "area": 5091.019777777311
+    },
+    {
+      "id": 4,
+      "image_id": 3,
+      "category_id": 0,
+      "segmentation": [],
+      "bbox": [
+        3391.327363195688,
+        77.38266595594139,
+        85.21442354783096,
+        56.45018706999522
+      ],
+      "ignore": 0,
+      "iscrowd": 0,
+      "area": 4810.370150336864
+    },
+    {
+      "id": 5,
+      "image_id": 4,
+      "category_id": 2,
+      "segmentation": [],
+      "bbox": [
+        227.20461095100865,
+        1982.5936599423628,
+        84.03458213256465,
+        74.69740634005807
+      ],
+      "ignore": 0,
+      "iscrowd": 0,
+      "area": 6277.165328173165
+    },
+    {
+      "id": 6,
+      "image_id": 5,
+      "category_id": 6,
+      "bbox": [
+        242,
+        310,
+        67,
+        62
+      ],
+      "area": 4154,
+      "iscrowd": 0
+    },
+    {
+      "id": 7,
+      "image_id": 5,
+      "category_id": 7,
+      "bbox": [
+        256,
+        746,
+        64,
+        48
+      ],
+      "area": 3072,
+      "iscrowd": 0
+    }
+  ],
+  "info": {
+    "year": 2025,
+    "version": "1.0",
+    "description": "",
+    "contributor": "Label Studio",
+    "url": "",
+    "date_created": "2025-12-14 20:30:21.030546"
+  }
+}
