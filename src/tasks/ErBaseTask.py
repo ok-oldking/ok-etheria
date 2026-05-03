@@ -180,7 +180,7 @@ class ErBaseTask(BaseTask):
 
     def battle(self, click_enter=True, use_preset=True):
         if click_enter:
-            battle = self.wait_ocr(box='bottom_right', match=['前往挑战', '开始战斗', '进入战斗'],
+            battle = self.wait_ocr(match=['前往挑战', '开始战斗', '进入战斗'],
                                    raise_if_not_found=True)
             self.sleep(1)
             self.click(battle, after_sleep=5)
