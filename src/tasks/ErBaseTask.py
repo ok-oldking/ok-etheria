@@ -178,7 +178,7 @@ class ErBaseTask(BaseTask):
         while battle := self.ocr(box='bottom_right', match='战斗'):
             self.click(battle, after_sleep=3)
 
-    def battle(self, click_enter=True, use_preset=True):
+    def battle(self, click_enter=True, use_preset=True, timeout=800):
         if click_enter:
             battle = self.wait_ocr(match=['前往挑战', '开始战斗', '进入战斗'],
                                    raise_if_not_found=True)
@@ -191,7 +191,7 @@ class ErBaseTask(BaseTask):
         else:
             self.click(battle)
         start = time.time()
-        while time.time() - start < 800:
+        while time.time() - start < timeout:
             texts = self.ocr()
             if manual := self.find_one('manual', horizontal_variance=0.05):
                 self.log_info('点击自动战斗')
